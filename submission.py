@@ -45,7 +45,22 @@ class BlackjackMDP(util.MDP):
     # in the list returned by succAndProbReward.
     def succAndProbReward(self, state, action):
         # BEGIN_YOUR_ANSWER (our solution is 44 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError  # remove this line before writing code
+        currentSum, peekedNext, deckCards = state
+        
+        # check every ending conditions ensure if the game ends
+        if  currentSum > self.threshold or action == 'Quit':
+            newSum, newPeekedNext, newDeckCards = currentSum, None, None
+        
+        
+        # check bust again before output
+        if  currentSum > self.threshold:
+            newSum, newPeekedNext, newDeckCards = currentSum, None, None
+        
+        newState = (newSum, newPeekedNext, newDeckCards)
+        prob = 0
+        reward = 0
+        
+        return (newState, prob, reward)
         # END_YOUR_ANSWER
 
     def discount(self):

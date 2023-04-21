@@ -46,42 +46,69 @@ class BlackjackMDP(util.MDP):
     def succAndProbReward(self, state, action):
         # BEGIN_YOUR_ANSWER (our solution is 44 lines of code, but don't worry if you deviate from this)
         currentSum, peekedNext, deckCards = state
+        result = []
+        
+        # ends game when deck is empty
+        if deckCards == None:
+            pass
         
         # check if the game ends with Quit
-        if action == 'Quit':
+        elif action == 'Quit':
             newSum = currentSum
             newState = (newSum, None, None)
-            result = [(newState, 1, 0)]
+            result = [(newState, 1, newSum)]
         
-        if action == 'Take':
+        elif action == 'Take':
             # Peeked
             if not peekedNext == None:
-                newSum = currentSum + peekedNext
+                newSum = currentSum + self.cardValues[peekedNext]
                 newPeekedNext = None
                 
                 newDeckCards = deckCards
-                newDeckCards[self.cardValues.index(peekedNext)] -= 1
+                newDeckCards[peekedNext] -= 1
                 
                 newState = (newSum, newPeekedNext, newDeckCards)
                 result = [(newState, 1, peekedNext)]
             
             # Not peeked
             else:
-                result = []
                 newPeekedNext = None
                 for i in range(len(self.cardValues)):
-                    newSum = currentSum + self.cardValues[i]
+                    reward = 0
+                    if deckCards[i] > 0:
+                        newSum = currentSum + self.cardValues[i]
+                        newDeckCards = list(deckCards)
+                        newDeckCards[i] = deckCards[i] -1
+                        newState = (newSum, newPeekedNext, tuple(newDeckCards))
+                    # check drawout before output
+                        if sum(newDeckCards) == 0:
+                            newState = (newSum, newPeekedNext, None)
+                            reward = newSum
+                    # check bust before output
+                        if newSum > self.threshold:
+                            newState = (newSum, newPeekedNext, None)
                     
-                    newDeckCards = list(deckCards)
-                    newDeckCards[i] = deckCards[i] -1
+                        result.append((newState, deckCards[i]/sum(deckCards), reward))
+        
+        elif action == 'Peek':
+            # Peeked
+            if not peekedNext == None:
+                pass
+            
+            # Not peeked
+            else:
+                for i in range(len(self.cardValues)):
+                    newSum = currentSum
+                    newPeekedNext = i
+                    newDeckCards = deckCards
                     
                     # check bust or drawout before output
                     if sum(newDeckCards) == 0 or newSum > self.threshold:
                         newDeckCards = None
                     
                     newState = (newSum, newPeekedNext, tuple(newDeckCards))
-                    result.append((newState, deckCards[i]/sum(deckCards), 0))
-        
+                    result.append((newState, deckCards[i]/sum(deckCards), -self.peekCost))
+            
         return result
         # END_YOUR_ANSWER
 

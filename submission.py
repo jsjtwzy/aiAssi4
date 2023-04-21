@@ -47,20 +47,42 @@ class BlackjackMDP(util.MDP):
         # BEGIN_YOUR_ANSWER (our solution is 44 lines of code, but don't worry if you deviate from this)
         currentSum, peekedNext, deckCards = state
         
-        # check every ending conditions ensure if the game ends
-        if  currentSum > self.threshold or action == 'Quit':
-            newSum, newPeekedNext, newDeckCards = currentSum, None, None
+        # check if the game ends with Quit
+        if action == 'Quit':
+            newSum = currentSum
+            newState = (newSum, None, None)
+            result = [(newState, 1, 0)]
         
+        if action == 'Take':
+            # Peeked
+            if not peekedNext == None:
+                newSum = currentSum + peekedNext
+                newPeekedNext = None
+                
+                newDeckCards = deckCards
+                newDeckCards[self.cardValues.index(peekedNext)] -= 1
+                
+                newState = (newSum, newPeekedNext, newDeckCards)
+                result = [(newState, 1, peekedNext)]
+            
+            # Not peeked
+            else:
+                result = []
+                newPeekedNext = None
+                for i in range(len(self.cardValues)):
+                    newSum = currentSum + self.cardValues[i]
+                    
+                    newDeckCards = list(deckCards)
+                    newDeckCards[i] = deckCards[i] -1
+                    
+                    # check bust or drawout before output
+                    if sum(newDeckCards) == 0 or newSum > self.threshold:
+                        newDeckCards = None
+                    
+                    newState = (newSum, newPeekedNext, tuple(newDeckCards))
+                    result.append((newState, deckCards[i]/sum(deckCards), 0))
         
-        # check bust again before output
-        if  currentSum > self.threshold:
-            newSum, newPeekedNext, newDeckCards = currentSum, None, None
-        
-        newState = (newSum, newPeekedNext, newDeckCards)
-        prob = 0
-        reward = 0
-        
-        return (newState, prob, reward)
+        return result
         # END_YOUR_ANSWER
 
     def discount(self):

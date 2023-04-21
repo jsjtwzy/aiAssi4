@@ -1,0 +1,28 @@
+{'extraCredit': 0,
+ 'fatalError': False,
+ 'maxExtraCredit': 0,
+ 'maxTotalPoints': 3,
+ 'messages': [],
+ 'mode': 'auto',
+ 'parts': [{'description': 'Basic test for succAndProbReward() that covers '
+                           'several edge cases.',
+            'extraCredit': False,
+            'maxPoints': 3,
+            'maxSeconds': 5,
+            'messages': ["Exception thrown: <class 'UnboundLocalError'> -- "
+                         "cannot access local variable 'result' where it is "
+                         'not associated with a value',
+                         '  File '
+                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\grader.py", '
+                         'line 63, in test_2a_1\n'
+                         '    mdp.succAndProbReward(state, action)):\n'
+                         '    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n',
+                         '  File '
+                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
+                         'line 85, in succAndProbReward\n'
+                         '    return result\n'
+                         '           ^^^^^^\n'],
+            'name': '2a-1-basic',
+            'points': 0,
+            'seconds': 0}],
+ 'totalPoints': 0}

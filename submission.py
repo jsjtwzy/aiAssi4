@@ -49,7 +49,7 @@ class BlackjackMDP(util.MDP):
         result = []
         
         # ends game when deck is empty
-        if deckCards == None:
+        if deckCards == None or sum(deckCards) == 0:
             pass
         
         # check if the game ends with Quit
@@ -64,10 +64,10 @@ class BlackjackMDP(util.MDP):
                 newSum = currentSum + self.cardValues[peekedNext]
                 newPeekedNext = None
                 
-                newDeckCards = deckCards
+                newDeckCards = list(deckCards)
                 newDeckCards[peekedNext] -= 1
                 
-                newState = (newSum, newPeekedNext, newDeckCards)
+                newState = (newSum, newPeekedNext, tuple(newDeckCards))
                 result = [(newState, 1, peekedNext)]
             
             # Not peeked
@@ -104,9 +104,9 @@ class BlackjackMDP(util.MDP):
                     
                     # check bust or drawout before output
                     if sum(newDeckCards) == 0 or newSum > self.threshold:
-                        newDeckCards = None
-                    
-                    newState = (newSum, newPeekedNext, tuple(newDeckCards))
+                        newState = (newSum, newPeekedNext, None)
+                    else:
+                        newState = (newSum, newPeekedNext, tuple(newDeckCards))
                     result.append((newState, deckCards[i]/sum(deckCards), -self.peekCost))
             
         return result
@@ -168,7 +168,12 @@ class Qlearning(util.RLAlgorithm):
             return
 
         # BEGIN_YOUR_ANSWER (our solution is 8 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError  # remove this line before writing code
+        newAction = self.getAction(newState)
+        dQ = (reward + self.discount *self.getQ(newState, newAction) -self.getQ(state, action))
+        while abs(dQ) > self.getStepSize():
+            newAction = self.getAction(newState)
+            dQ = (reward + self.discount *self.getQ(newState, newAction) -self.getQ(state, action))
+            self.weights[(state, action)] += dQ
         # END_YOUR_ANSWER
 
 

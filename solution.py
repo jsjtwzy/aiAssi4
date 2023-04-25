@@ -6,6 +6,7 @@ from util import ValueIteration
 ############################################################
 # Problem 2a: BlackjackMDP
 
+SEED = 114514
 
 class BlackjackMDP(util.MDP):
     def __init__(self, cardValues, multiplicity, threshold, peekCost):
@@ -44,73 +45,48 @@ class BlackjackMDP(util.MDP):
     # When the probability is 0 for a particular transition, don't include that 
     # in the list returned by succAndProbReward.
     def succAndProbReward(self, state, action):
-        # BEGIN_YOUR_ANSWER (our solution is 44 lines of code, but don't worry if you deviate from this)
-        currentSum, peekedNext, deckCards = state
-        result = []
-        
-        # ends game when deck is empty
-        if deckCards == None or sum(deckCards) == 0:
-            pass
-        
-        # check if the game ends with Quit
-        elif action == 'Quit':
-            newSum = currentSum
-            newState = (newSum, None, None)
-            result = [(newState, 1, newSum)]
-        
-        elif action == 'Take':
-            # Peeked
-            if not peekedNext == None:
-                newSum = currentSum + self.cardValues[peekedNext]
-                newPeekedNext = None
-                
-                newDeckCards = list(deckCards)
-                newDeckCards[peekedNext] -= 1
-                
-                newState = (newSum, newPeekedNext, tuple(newDeckCards))
-                result = [(newState, 1, peekedNext)]
+        total, next_card_idx, deck_counts = state
+    
+        if deck_counts is None:
+            return []
+    
+        results = []
+        num_cards = sum(deck_counts)
+    
+        if action == 'Take':
+            if next_card_idx is not None:
+                new_total = total + self.cardValues[next_card_idx]
+                new_deck_counts = list(deck_counts)
+                new_deck_counts[next_card_idx] -= 1
             
-            # Not peeked
+                if new_total > self.threshold:
+                    results.append(((new_total, None, None), 1, 0))
+                else:
+                    results.append(((new_total, None, tuple(new_deck_counts)), 1, 0))
             else:
-                newPeekedNext = None
-                for i in range(len(self.cardValues)):
-                    reward = 0
-                    if deckCards[i] > 0:
-                        newSum = currentSum + self.cardValues[i]
-                        newDeckCards = list(deckCards)
-                        newDeckCards[i] = deckCards[i] -1
-                        newState = (newSum, newPeekedNext, tuple(newDeckCards))
-                    # check drawout before output
-                        if sum(newDeckCards) == 0:
-                            newState = (newSum, newPeekedNext, None)
-                            reward = newSum
-                    # check bust before output
-                        if newSum > self.threshold:
-                            newState = (newSum, newPeekedNext, None)
+                for i, count in enumerate(deck_counts):
+                    if count > 0:
+                        new_total = total + self.cardValues[i]
+                        new_deck_counts = list(deck_counts)
+                        new_deck_counts[i] -= 1
                     
-                        result.append((newState, deckCards[i]/sum(deckCards), reward))
-        
+                        if new_total > self.threshold:
+                            results.append(((new_total, None, None), count / num_cards, 0))
+                        else:
+                            results.append(((new_total, None, tuple(new_deck_counts)), count / num_cards, 0))
+                        
         elif action == 'Peek':
-            # Peeked
-            if not peekedNext == None:
-                pass
-            
-            # Not peeked
+            if next_card_idx is not None:
+                return []
             else:
-                for i in range(len(self.cardValues)):
-                    newSum = currentSum
-                    newPeekedNext = i
-                    newDeckCards = deckCards
+                for i, count in enumerate(deck_counts):
+                    if count > 0:
+                        results.append(((total, i, deck_counts), count / num_cards, -self.peekCost))
                     
-                    # check bust or drawout before output
-                    if sum(newDeckCards) == 0 or newSum > self.threshold:
-                        newState = (newSum, newPeekedNext, None)
-                    else:
-                        newState = (newSum, newPeekedNext, tuple(newDeckCards))
-                    result.append((newState, deckCards[i]/sum(deckCards), -self.peekCost))
-            
-        return result
-        # END_YOUR_ANSWER
+        elif action == 'Quit':
+            results.append(((total, None, None), 1, total))
+    
+        return results
 
     def discount(self):
         return 1
@@ -167,14 +143,12 @@ class Qlearning(util.RLAlgorithm):
         if isLast(state):
             return
 
-        # BEGIN_YOUR_ANSWER (our solution is 8 lines of code, but don't worry if you deviate from this)
-        newAction = self.getAction(newState)
-        dQ = (reward + self.discount *self.getQ(newState, newAction) -self.getQ(state, action))
-        while abs(dQ) > self.getStepSize():
-            newAction = self.getAction(newState)
-            dQ = (reward + self.discount *self.getQ(newState, newAction) -self.getQ(state, action))
-            self.weights[(state, action)] += dQ
-        # END_YOUR_ANSWER
+        max_q = max(self.getQ(newState, a) for a in self.actions(newState)) if not isLast(newState) else 0
+        q = self.getQ(state, action)
+        alpha = self.getStepSize()
+
+        for f, v in self.featureExtractor(state, action):
+            self.weights[f] += alpha * (reward + self.discount * max_q - q) * v
 
 
 ############################################################
@@ -194,14 +168,12 @@ class SARSA(Qlearning):
             state, action, reward, newState, newAction = episode[-7: -2]
         else:
             return
+        q = self.getQ(state, action)
+        q_next = self.getQ(newState, newAction) if not isLast(newState) else 0
+        alpha = self.getStepSize()
 
-        # BEGIN_YOUR_ANSWER (our solution is 8 lines of code, but don't worry if you deviate from this)
-        dQ = (reward + self.discount *self.getQ(newState, newAction) -self.getQ(state, action))
-        for _  in range(10):
-            newAction = self.getAction(newState)
-            dQ = (reward + self.discount *self.getQ(newState, newAction) -self.getQ(state, action))
-            self.weights[(state, action)] += dQ
-        # END_YOUR_ANSWER
+        for f, v in self.featureExtractor(state, action):
+            self.weights[f] += alpha * (reward + self.discount * q_next - q) * v
 
 # Return a singleton list containing indicator feature (if exist featurevalue = 1)
 # for the (state, action) pair.
@@ -227,6 +199,13 @@ def identityFeatureExtractor(state, action):
 
 def blackjackFeatureExtractor(state, action):
     total, nextCard, counts = state
-    # BEGIN_YOUR_ANSWER (our solution is 8 lines of code, but don't worry if you deviate from this)
-    raise NotImplementedError  # remove this line before writing code
-    # END_YOUR_ANSWER
+    features = []
+
+    features.append(((total, action), 1))
+    if counts is not None:
+        presence = tuple(1 if c > 0 else 0 for c in counts)
+        features.append(((presence, action), 1))
+        for i, count in enumerate(counts):
+            features.append((((i, count, action), 1)))
+
+    return features

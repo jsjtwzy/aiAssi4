@@ -1,7 +1,7 @@
 {'extraCredit': 0,
  'fatalError': False,
  'maxExtraCredit': 0,
- 'maxTotalPoints': 12,
+ 'maxTotalPoints': 20,
  'messages': [],
  'mode': 'auto',
  'parts': [{'description': 'Basic test for succAndProbReward() that covers '
@@ -19,7 +19,7 @@
             'extraCredit': False,
             'maxPoints': 2,
             'maxSeconds': 5,
-            'messages': [],
+            'messages': ['Expected to be true, but got false'],
             'name': '2a-2-hidden',
             'points': 0,
             'seconds': 2},
@@ -38,7 +38,7 @@
             'extraCredit': False,
             'maxPoints': 2,
             'maxSeconds': 3,
-            'messages': [],
+            'messages': ['Expected to be true, but got false'],
             'name': '3a-2-hidden',
             'points': 0,
             'seconds': 1},
@@ -47,20 +47,9 @@
             'extraCredit': False,
             'maxPoints': 3,
             'maxSeconds': 3,
-            'messages': ["Exception thrown: <class 'NotImplementedError'> -- ",
-                         '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\grader.py", '
-                         'line 148, in test_3b_1\n'
-                         '    rl.incorporateFeedback([0, 1, 0, 1, 1, None, '
-                         'None], mdp.isEnd)\n',
-                         '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 199, in incorporateFeedback\n'
-                         '    raise NotImplementedError  # remove this line '
-                         'before writing code\n'
-                         '    ^^^^^^^^^^^^^^^^^^^^^^^^^\n'],
+            'messages': [],
             'name': '3b-1-basic',
-            'points': 0,
+            'points': 3,
             'seconds': 0},
            {'description': 'Hidden test for incorporateFeedback(). Run SARSA '
                            'on a small MDP, then ensure that getQ returns '
@@ -68,29 +57,10 @@
             'extraCredit': False,
             'maxPoints': 2,
             'maxSeconds': 3,
-            'messages': ["Exception thrown: <class 'NotImplementedError'> -- ",
-                         '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\grader.py", '
-                         'line 182, in test_3b_2\n'
-                         '    pred = get_policy(submission.SARSA)\n'
-                         '           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n',
-                         '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\grader.py", '
-                         'line 177, in get_policy\n'
-                         '    util.simulate(mdp, rl, numTrials=15000)\n',
-                         '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\util.py", '
-                         'line 189, in simulate\n'
-                         '    rl.incorporateFeedback(episode, isLast)\n',
-                         '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 199, in incorporateFeedback\n'
-                         '    raise NotImplementedError  # remove this line '
-                         'before writing code\n'
-                         '    ^^^^^^^^^^^^^^^^^^^^^^^^^\n'],
+            'messages': ['Expected to be true, but got false'],
             'name': '3b-2-hidden',
             'points': 0,
-            'seconds': 0},
+            'seconds': 2},
            {'description': 'Basic test for blackjackFeatureExtractor.  Runs '
                            'Qlearning using blackjackFeatureExtractor, then '
                            'checks to see that Q-values are correct.',
@@ -130,7 +100,7 @@
                          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n',
                          '  File '
                          '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 227, in blackjackFeatureExtractor\n'
+                         'line 231, in blackjackFeatureExtractor\n'
                          '    raise NotImplementedError  # remove this line '
                          'before writing code\n'
                          '    ^^^^^^^^^^^^^^^^^^^^^^^^^\n'],
@@ -154,32 +124,32 @@
                          '    action = rl.getAction(state)\n'
                          '             ^^^^^^^^^^^^^^^^^^^\n',
                          '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 152, in getAction\n'
+                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\solution.py", '
+                         'line 128, in getAction\n'
                          '    return max((self.getQ(state, action), action) '
                          'for action in self.actions(state))[1]\n'
                          '           '
                          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n',
                          '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 152, in <genexpr>\n'
+                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\solution.py", '
+                         'line 128, in <genexpr>\n'
                          '    return max((self.getQ(state, action), action) '
                          'for action in self.actions(state))[1]\n'
                          '                ^^^^^^^^^^^^^^^^^^^^^^^^\n',
                          '  File '
-                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 140, in getQ\n'
+                         '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\solution.py", '
+                         'line 116, in getQ\n'
                          '    for f, v in self.featureExtractor(state, '
                          'action):\n'
                          '                '
                          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n',
                          '  File '
                          '"c:\\Users\\Administrator\\Documents\\Wang\\aiAssi4\\submission.py", '
-                         'line 227, in blackjackFeatureExtractor\n'
+                         'line 231, in blackjackFeatureExtractor\n'
                          '    raise NotImplementedError  # remove this line '
                          'before writing code\n'
                          '    ^^^^^^^^^^^^^^^^^^^^^^^^^\n'],
             'name': '3c-2-hidden',
             'points': 0,
             'seconds': 0}],
- 'totalPoints': 6}
+ 'totalPoints': 9}
